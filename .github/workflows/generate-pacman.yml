@@ -6,7 +6,7 @@ on:
       - main
   workflow_dispatch:
   schedule:
-    - cron: '0 2 * * *' # daily at 02:00 UTC (optional)
+    - cron: '0 2 * * *'
 
 jobs:
   generate:
@@ -15,23 +15,56 @@ jobs:
       - name: Checkout repository (with token)
         uses: actions/checkout@v4
         with:
-          persist-credentials: true  # allow pushes using GITHUB_TOKEN
+          persist-credentials: true
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
 
-      - name: Download pacman generator (no git clone)
+      - name: Download pacman generator (robust)
         run: |
           rm -rf pacman_tmp || true
           mkdir -p pacman_tmp
-          echo "Downloading maurodesouz/maurodesouz main branch as zip..."
-          curl -L -o pacman_tmp/pacman.zip https://github.com/maurodesouz/maurodesouz/archive/refs/heads/main.zip
-          unzip -q pacman_tmp/pacman.zip -d pacman_tmp
-          mv pacman_tmp/maurodesouz-main/* pacman_tmp/ || true
+          echo "Downloading maurodesouz/maurodesouz main branch as zip via codeload..."
+          CODELOAD_URL="https://codeload.github.com/maurodesouz/maurodesouz/zip/refs/heads/main"
+          # retry and follow redirects; fail on 4xx/5xx
+          curl -L --retry 5 --retry-delay 2 --retry-max-time 60 --fail -o pacman_tmp/pacman.zip "$CODELOAD_URL" || true
+          echo "Downloaded file size:"
+          if [ -f pacman_tmp/pacman.zip ]; then
+            stat -c '%n %s bytes' pacman_tmp/pacman.zip || ls -la pacman_tmp
+          else
+            echo "pacman.zip not found."
+            ls -la pacman_tmp || true
+          fi
+
+          # If zip too small, print contents for debugging and exit non-zero so logs show it
+          MIN_BYTES=2048
+          if [ ! -f pacman_tmp/pacman.zip ] || [ $(stat -c%s pacman_tmp/pacman.zip || echo 0) -lt $MIN_BYTES ]; then
+            echo "Downloaded archive is too small or missing — printing file for debugging:"
+            echo "---- BEGIN pacman.zip (raw) ----"
+            if [ -f pacman_tmp/pacman.zip ]; then
+              hexdump -C pacman_tmp/pacman.zip | sed -n '1,80p' || true
+              echo "---- TEXT FALLBACK ----"
+              sed -n '1,200p' pacman_tmp/pacman.zip || true
+            else
+              echo "(no file)"
+            fi
+            echo "---- END pacman.zip ----"
+            # show remote headers (for debugging)
+            echo "Fetching HTTP headers from codeload to display server response:"
+            curl -I -L --fail "$CODELOAD_URL" || true
+            # fail the step so logs are visible; remove 'exit 1' to continue instead
+            exit 1
+          fi
+
+          unzip -q pacman_tmp/pacman.zip -d pacman_tmp || true
+          # move extracted contents (folder likely named maurodesouz-main)
+          if [ -d pacman_tmp/maurodesouz-main ]; then
+            mv pacman_tmp/maurodesouz-main/* pacman_tmp/ || true
+          fi
           rm -f pacman_tmp/pacman.zip
-          echo "List pacman_tmp/ after download:"
+          echo "Downloaded folder listing:"
           ls -la pacman_tmp
 
       - name: Install pacman generator deps (if any)
@@ -42,7 +75,7 @@ jobs:
           else
             echo "No package.json found; skipping npm install."
           fi
-          echo "Working dir files:"
+          echo "Generator working dir contents:"
           ls -la
 
       - name: Run generator for this username
@@ -51,39 +84,27 @@ jobs:
         working-directory: pacman_tmp
         run: |
           echo "Attempting known generator entrypoints..."
-          set -e || true
+          # try common npm scripts or node scripts
           if npm run | grep -q "generate"; then
-            echo "Running: npm run generate -- --username $TARGET_USERNAME"
             npm run generate --silent -- --username "$TARGET_USERNAME" || true
           fi
           if [ -f index.js ]; then
-            echo "Running: node index.js --username $TARGET_USERNAME"
             node index.js --username "$TARGET_USERNAME" || true
           fi
           if [ -f generate.js ]; then
-            echo "Running: node generate.js --username $TARGET_USERNAME"
             node generate.js --username "$TARGET_USERNAME" || true
           fi
-          echo "Done attempting to run generator. Listing files:"
+          echo "Listing pacman_tmp after run:"
           ls -la
-          if [ -d output ]; then
-            echo "Generator placed output/ in pacman_tmp:"
-            ls -la output || true
-          fi
+          if [ -d output ]; then ls -la output || true; fi
 
       - name: Copy generated output into this repo
         run: |
           mkdir -p output
-          if [ -d pacman_tmp/output ]; then
-            cp -r pacman_tmp/output/* output/ || true
-          fi
-          if [ -d pacman_tmp/dist ]; then
-            cp -r pacman_tmp/dist/* output/ || true
-          fi
-          if [ -d pacman_tmp/output_images ]; then
-            cp -r pacman_tmp/output_images/* output/ || true
-          fi
-          echo "Files copied into output/ (if any):"
+          cp -r pacman_tmp/output/* output/ 2>/dev/null || true
+          cp -r pacman_tmp/dist/* output/ 2>/dev/null || true
+          cp -r pacman_tmp/output_images/* output/ 2>/dev/null || true
+          echo "Files now in output/:"
           ls -la output || true
 
       - name: Commit and push generated output (if any)
