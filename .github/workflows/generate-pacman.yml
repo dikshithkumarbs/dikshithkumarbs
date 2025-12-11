@@ -1,0 +1,89 @@
+name: Generate Pacman Contribution Graph
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  schedule:
+    - cron: '0 2 * * *' # daily at 02:00 UTC (optional)
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Clone pacman generator (temporary)
+        run: |
+          rm -rf pacman_tmp || true
+          git clone https://github.com/maurodesouz/maurodesouz.git pacman_tmp
+
+      - name: Install pacman generator deps
+        working-directory: pacman_tmp
+        run: |
+          # install deps if package.json exists
+          if [ -f package.json ]; then
+            npm ci
+          fi
+
+      - name: Run generator for this username
+        env:
+          TARGET_USERNAME: ${{ github.repository_owner }}
+        working-directory: pacman_tmp
+        run: |
+          # Many pacman generators expose a script; try common entrypoints.
+          # First try npm run generate (fallback to node scripts/generate.js)
+          if npm run | grep -q "generate"; then
+            npm run generate --silent -- --username "$TARGET_USERNAME" || true
+          fi
+
+          # fallback: try node index.js or node generate.js with username argument
+          if [ -f index.js ]; then
+            node index.js --username "$TARGET_USERNAME" || true
+          fi
+          if [ -f generate.js ]; then
+            node generate.js --username "$TARGET_USERNAME" || true
+          fi
+
+          # If generator wrote to pacman_tmp/output or ./output, proceed. We'll search for common output folders.
+          ls -la
+
+      - name: Copy generated output into this repo
+        run: |
+          # create output folder if missing
+          mkdir -p output
+          # try some common locations where generator may place output
+          if [ -d pacman_tmp/output ]; then
+            cp -r pacman_tmp/output/* output/ || true
+          fi
+          if [ -d pacman_tmp/dist ]; then
+            cp -r pacman_tmp/dist/* output/ || true
+          fi
+          if [ -d pacman_tmp/output_images ]; then
+            cp -r pacman_tmp/output_images/* output/ || true
+          fi
+          # List what's in output now
+          ls -la output || true
+
+      - name: Commit and push generated output (if any)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add output || true
+          if git diff --cached --quiet; then
+            echo "No changes in output to commit."
+            exit 0
+          fi
+          git commit -m "chore: update pacman contribution graph for ${{ github.repository_owner }}" || true
+          git push origin HEAD:${{ github.ref_name }}
