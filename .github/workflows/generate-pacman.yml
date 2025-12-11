@@ -12,56 +12,73 @@ jobs:
   generate:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout repository (with token)
         uses: actions/checkout@v4
         with:
-          persist-credentials: false
+          persist-credentials: true  # allow pushes using GITHUB_TOKEN
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
 
-      - name: Clone pacman generator (temporary)
+      - name: Download pacman generator (no git clone)
         run: |
           rm -rf pacman_tmp || true
-          git clone https://github.com/maurodesouz/maurodesouz.git pacman_tmp
+          mkdir -p pacman_tmp
+          echo "Downloading maurodesouz/maurodesouz main branch as zip..."
+          curl -L -o pacman_tmp/pacman.zip https://github.com/maurodesouz/maurodesouz/archive/refs/heads/main.zip
+          unzip -q pacman_tmp/pacman.zip -d pacman_tmp
+          # move extracted folder contents up one level (the zip contains a folder named maurodesouz-main)
+          mv pacman_tmp/maurodesouz-main/* pacman_tmp/ || true
+          rm -f pacman_tmp/pacman.zip
+          echo "List pacman_tmp/ after download:"
+          ls -la pacman_tmp
 
-      - name: Install pacman generator deps
+      - name: Install pacman generator deps (if any)
         working-directory: pacman_tmp
         run: |
-          # install deps if package.json exists
           if [ -f package.json ]; then
-            npm ci
+            npm ci --silent
+          else
+            echo "No package.json found; skipping npm install."
           fi
+          echo "Working dir files:"
+          ls -la
 
       - name: Run generator for this username
         env:
           TARGET_USERNAME: ${{ github.repository_owner }}
         working-directory: pacman_tmp
         run: |
-          # Many pacman generators expose a script; try common entrypoints.
-          # First try npm run generate (fallback to node scripts/generate.js)
+          echo "Attempting known generator entrypoints..."
+          set -e || true
+          # try npm script named generate
           if npm run | grep -q "generate"; then
+            echo "Running: npm run generate -- --username $TARGET_USERNAME"
             npm run generate --silent -- --username "$TARGET_USERNAME" || true
           fi
-
-          # fallback: try node index.js or node generate.js with username argument
+          # fallback to common node scripts
           if [ -f index.js ]; then
+            echo "Running: node index.js --username $TARGET_USERNAME"
             node index.js --username "$TARGET_USERNAME" || true
           fi
           if [ -f generate.js ]; then
+            echo "Running: node generate.js --username $TARGET_USERNAME"
             node generate.js --username "$TARGET_USERNAME" || true
           fi
-
-          # If generator wrote to pacman_tmp/output or ./output, proceed. We'll search for common output folders.
+          # If there is a specific script file honored by that repo, it's now run.
+          echo "Done attempting to run generator. Listing files:"
           ls -la
+          if [ -d output ]; then
+            echo "Generator placed output/ in pacman_tmp:"
+            ls -la output || true
+          fi
 
       - name: Copy generated output into this repo
         run: |
-          # create output folder if missing
           mkdir -p output
-          # try some common locations where generator may place output
+          # try common output locations
           if [ -d pacman_tmp/output ]; then
             cp -r pacman_tmp/output/* output/ || true
           fi
@@ -71,7 +88,7 @@ jobs:
           if [ -d pacman_tmp/output_images ]; then
             cp -r pacman_tmp/output_images/* output/ || true
           fi
-          # List what's in output now
+          echo "Files copied into output/ (if any):"
           ls -la output || true
 
       - name: Commit and push generated output (if any)
@@ -81,9 +98,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add output || true
+          # Always show git status for debugging
+          git status --porcelain || true
           if git diff --cached --quiet; then
             echo "No changes in output to commit."
             exit 0
           fi
           git commit -m "chore: update pacman contribution graph for ${{ github.repository_owner }}" || true
-          git push origin HEAD:${{ github.ref_name }}
+          git push origin HEAD:${{ github.ref_name }} || (git push origin HEAD && echo "Pushed fallback")
