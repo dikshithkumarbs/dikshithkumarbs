@@ -29,7 +29,6 @@ jobs:
           echo "Downloading maurodesouz/maurodesouz main branch as zip..."
           curl -L -o pacman_tmp/pacman.zip https://github.com/maurodesouz/maurodesouz/archive/refs/heads/main.zip
           unzip -q pacman_tmp/pacman.zip -d pacman_tmp
-          # move extracted folder contents up one level (the zip contains a folder named maurodesouz-main)
           mv pacman_tmp/maurodesouz-main/* pacman_tmp/ || true
           rm -f pacman_tmp/pacman.zip
           echo "List pacman_tmp/ after download:"
@@ -53,12 +52,10 @@ jobs:
         run: |
           echo "Attempting known generator entrypoints..."
           set -e || true
-          # try npm script named generate
           if npm run | grep -q "generate"; then
             echo "Running: npm run generate -- --username $TARGET_USERNAME"
             npm run generate --silent -- --username "$TARGET_USERNAME" || true
           fi
-          # fallback to common node scripts
           if [ -f index.js ]; then
             echo "Running: node index.js --username $TARGET_USERNAME"
             node index.js --username "$TARGET_USERNAME" || true
@@ -67,7 +64,6 @@ jobs:
             echo "Running: node generate.js --username $TARGET_USERNAME"
             node generate.js --username "$TARGET_USERNAME" || true
           fi
-          # If there is a specific script file honored by that repo, it's now run.
           echo "Done attempting to run generator. Listing files:"
           ls -la
           if [ -d output ]; then
@@ -78,7 +74,6 @@ jobs:
       - name: Copy generated output into this repo
         run: |
           mkdir -p output
-          # try common output locations
           if [ -d pacman_tmp/output ]; then
             cp -r pacman_tmp/output/* output/ || true
           fi
@@ -98,7 +93,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add output || true
-          # Always show git status for debugging
           git status --porcelain || true
           if git diff --cached --quiet; then
             echo "No changes in output to commit."
