@@ -56,7 +56,7 @@
 #### 🌾 AgroConnect => Full-stack agriculture support platform for farmers & experts.  **Tech:** PHP • MySQL • HTML • CSS • JavaScript  
   DEMO 🔗 https://agroconnect.infinityfree.me/ 
 #### 🧠 TechQuiz R3 => Software logo guessing quiz with admin uploads & hints.  **Tech:** HTML • CSS • JavaScript 
-  🔗 https://github.com/dikshithkumarbs/TechQuiz-R3-
+  DEMO 🔗 https://dk-tech-quiz.netlify.app/
 
 
 ### 🔗 Quick Links
