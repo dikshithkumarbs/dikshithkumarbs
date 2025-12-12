@@ -16,7 +16,9 @@
   </a>
   <img src="https://img.shields.io/static/v1?message=Twitter&logo=twitter&color=1DA1F2&logoColor=white&style=for-the-badge" height="25" alt="twitter logo"  />
   <img src="https://img.shields.io/static/v1?message=Discord&logo=discord&color=7289DA&logoColor=white&style=for-the-badge" height="25" alt="discord logo"  />
+  <a href="https://www.instagram.com/dixt_kumar/" target="_blank">
   <img src="https://img.shields.io/static/v1?message=Instagram&logo=instagram&color=E4405F&logoColor=white&style=for-the-badge" height="25" alt="instagram logo"  />
+  </a>
 </div>
 
 ###
