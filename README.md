@@ -54,7 +54,7 @@
 #### 🎬 Movie Mania => Frontend movie search app with a clean UI.  **Tech:** HTML • CSS • JavaScript  
   🔗 https://github.com/dikshithkumarbs/movie-mania
 #### 🌾 AgroConnect => Full-stack agriculture support platform for farmers & experts.  **Tech:** PHP • MySQL • HTML • CSS • JavaScript  
-  🔗 https://github.com/dikshithkumarbs/Agroconnect
+  DEMO 🔗 https://agroconnect.infinityfree.me/ 
 #### 🧠 TechQuiz R3 => Software logo guessing quiz with admin uploads & hints.  **Tech:** HTML • CSS • JavaScript 
   🔗 https://github.com/dikshithkumarbs/TechQuiz-R3-
 
