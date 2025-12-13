@@ -34,29 +34,39 @@
   <img src="https://readme-typing-svg.demolab.com?font=Roboto&duration=2000&pause=800&color=FFFFFF&center=true&vCenter=true&width=500&lines=I+build+fast%2C+clean+web+apps.;I+love+UI%2FUX+and+frontend.;Backend+%2B+databases+%3D+fun.;Coding+every+day+%3D+growth." alt="typing text" />
 </div>
 
-### 🚀 Projects
-<div align="left" >
-<h4>🎬 Movie Mania</h4>
-<p>
-<p>end movie search app with a clean UI.<br>
-<b>Tech:</b> HTML • CSS • JavaScript<br>
-🔗 <a href="https://github.com/dikshithkumarbs/movie-mania" target="_blank">View Repository</a>
-</p>
 
-<h4>🌾 AgroConnect</h4>
-<p>
-Full-stack agriculture support platform for farmers & experts.<br>
-<b>Tech:</b> PHP • MySQL • HTML • CSS • JavaScript<br>
-🔗 <a href="https://agroconnect.infinityfree.me/" target="_blank">Live Demo</a>
-</p>
 
-<h4>🧠 TechQuiz R3</h4>
-<p>
-Software logo guessing quiz with admin uploads & hints.<br>
-<b>Tech:</b> HTML • CSS • JavaScript<br>
-🔗 <a href="https://dk-tech-quiz.netlify.app/" target="_blank">Live Demo</a>
-</p>
-</div>
+### 🚀 Projects & Stats
+
+<table>
+  <tr>
+    <!-- Left Column: Projects -->
+    <td valign="top" width="60%">
+      <h4>🌾 AgroConnect</h4>
+      <p>Full-stack agriculture support platform for farmers & experts.<br>
+      <b>Tech:</b> PHP • MySQL • HTML • CSS • JavaScript<br>
+      🔗 <a href="https://agroconnect.infinityfree.me/" target="_blank">Live Demo</a>
+      </p>
+      <h4>🧠 TechQuiz R3</h4>
+      <p>Software logo guessing quiz with admin uploads & hints.<br>
+      <b>Tech:</b> HTML • CSS • JavaScript<br>
+      🔗 <a href="https://dk-tech-quiz.netlify.app/" target="_blank">Live Demo</a>
+      </p>
+      <h4>🎬 Movie Mania</h4>
+      <p>An Web movie search app with a clean UI.<br>
+      <b>Tech:</b> HTML • CSS • JavaScript<br>
+      🔗 <a href="https://github.com/dikshithkumarbs/movie-mania" target="_blank">View Repository</a>
+      </p>
+    </td>
+    <!-- Right Column: GitHub Stats -->
+    <td valign="top" width="auto">
+      <img src="https://github-readme-stats.vercel.app/api/top-langs?username=dikshithkumarbs&show_icons=true&locale=en&layout=compact" alt="dikshithkumarbs" />
+      <p>&nbsp;<img align="center" src="https://github-readme-stats.vercel.app/api?username=dikshithkumarbs&show_icons=true&locale=en" alt="dikshithkumarbs" /></p>
+      <p><img align="center" src="https://github-readme-streak-stats.herokuapp.com/?user=dikshithkumarbs&" alt="dikshithkumarbs" /></p>
+    </td>
+  </tr>
+</table>
+
 
 ### 🔗 Quick Links
 
@@ -73,7 +83,7 @@ Software logo guessing quiz with admin uploads & hints.<br>
 
 <h3 align="center">A focused frontend engineer from India who builds clean, responsive web apps and enjoys thoughtful UI/UX. I balance practical backend know-how with polished interfaces.</h3>
 
-<h3 align="left">Connect with me:</h3>
+### Connect with me:
 
 <p align="left"><div align="center">
 <a href="https://www.linkedin.com/in/dikshithkumarbs/" target="_blank">
@@ -91,11 +101,15 @@ Software logo guessing quiz with admin uploads & hints.<br>
 <a href="https://www.instagram.com/dixt_kumar/" target="_blank">
 <img src="https://img.shields.io/badge/Instagram-E4405F?logo=instagram&logoColor=white&style=for-the-badge" height="25" />
 </a>
-</div>
 </p>
 
-<p><img align="left" src="https://github-readme-stats.vercel.app/api/top-langs?username=dikshithkumarbs&show_icons=true&locale=en&layout=compact" alt="dikshithkumarbs" /></p>
-<h3 align="right">👾 Pac-Man Contribution Animation </h3><img align="right" src="https://raw.githubusercontent.com/dikshithkumarbs/dikshithkumarbs/main/output/pacman.gif" height="250" alt="Pac-Man contribution animation" />
+<h3  align="left">👾 Pac-Man Animation :</h3>
+
+<img align="center" src="https://raw.githubusercontent.com/dikshithkumarbs/dikshithkumarbs/main/output/pacman.gif" height="250" alt="Pac-Man contribution animation" />
+
+
+
+
 
 
 
