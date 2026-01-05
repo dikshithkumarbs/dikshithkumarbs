@@ -72,7 +72,7 @@
 ### 🔗 Quick Links
 
 <div align="center">
-  <a href="https://your-portfolio-placeholder.example.com" target="_blank">
+  <a href="https://dikshith.vercel.app/" target="_blank">
     <img src="https://img.shields.io/badge/Portfolio-Visit-111827?style=for-the-badge&logo=read-the-docs&logoColor=white" alt="Portfolio" />
   </a>
   <a href="https://github.com/dikshithkumarbs?tab=repositories" target="_blank">
